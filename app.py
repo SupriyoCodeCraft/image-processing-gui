@@ -49,9 +49,17 @@ if uploaded_file is not None:
     # Resize image for proper scaling
     image = cv2.resize(image, (400, 400))  
 
-    # Select filter
+    # Store the selected filter in session state
+    if "filter_option" not in st.session_state:
+        st.session_state.filter_option = "Conservative Smoothing"
+
+    # Select filter (with dynamic updating)
     filter_option = st.radio("Choose a filter:", 
-                             ["Conservative Smoothing", "Median Smoothing", "Mean Smoothing", "Edge Detection"])
+                             ["Conservative Smoothing", "Median Smoothing", "Mean Smoothing", "Edge Detection"],
+                             index=["Conservative Smoothing", "Median Smoothing", "Mean Smoothing", "Edge Detection"].index(st.session_state.filter_option))
+
+    # Update session state
+    st.session_state.filter_option = filter_option
 
     # Apply selected filter dynamically
     if filter_option == "Conservative Smoothing":
@@ -67,10 +75,6 @@ if uploaded_file is not None:
     col1, col2 = st.columns(2)
     col1.image(image, caption="Original Image", use_column_width=True)
     col2.image(filtered_image, caption="Filtered Image", use_column_width=True)
-
-    # Allow re-filtering without re-uploading
-    if st.button("Reapply Filter"):
-        st.experimental_rerun()
 
     # Save filtered image
     filtered_image_pil = Image.fromarray(filtered_image)
